@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mouse Paddle Game</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: black;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+    #paddle {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 20px;
+        background-color: blue;
+        border-radius: 5px;
+        cursor: none;
+    }
+    #ball {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: green;
+        border-radius: 50%;
+    }
+    #gameOver {
+        display: none;
+    }
+</style>
+</head>
+<body>
+<div id="paddle"></div>
+<div id="ball"></div>
+<div id="gameOver">Game Over</div>
+<script>
+    const paddle = document.getElementById('paddle');
+    const ball = document.getElementById('ball');
+    const gameOver = document.getElementById('gameOver');
+    let ballX = window.innerWidth / 2;
+    let ballY = 0;
+    let ballSpeedX = 3;
+    let ballSpeedY = 3;
+    let gameEnded = false;
+
+    function movePaddle(e) {
+        const mouseX = e.clientX;
+        paddle.style.left = mouseX - paddle.offsetWidth / 2 + 'px';
+    }
+
+    function moveBall() {
+        if (!gameEnded) {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
+
+            // Check collision with walls
+            if (ballX <= 0 || ballX + ball.offsetWidth >= window.innerWidth) {
+                ballSpeedX *= -1;
+            }
+            if (ballY <= 0) {
+                ballSpeedY *= -1;
+            }
+            if (ballY + ball.offsetHeight >= window.innerHeight) {
+                endGame();
+            }
+
+            // Check collision with paddle
+            const paddleRect = paddle.getBoundingClientRect();
+            const ballRect = ball.getBoundingClientRect();
+            if (ballRect.bottom >= paddleRect.top && ballRect.left >= paddleRect.left && ballRect.right <= paddleRect.right) {
+                ballSpeedY *= -1;
+            }
+        }
+
+        requestAnimationFrame(moveBall);
+    }
+
+    function endGame() {
+        gameEnded = true;
+        ball.style.display = 'none';
+        gameOver.style.display = 'block';
+    }
+
+    document.addEventListener('mousemove', movePaddle);
+
+    moveBall();
+</script>
+</body>
+</html>
